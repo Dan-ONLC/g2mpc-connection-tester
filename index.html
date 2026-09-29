@@ -49,7 +49,7 @@
   </div>
 
   <div class="card note">
-    <strong>Not testable from a web page:</strong> UDP 8200, 1853, 3489 and 15000, and TCP 8200 (needed only if your policy lists explicit ports/IPs). Inbound connections are not required.
+    <strong>Not testable from a web page:</strong> TCP 80 (browsers block plain-HTTP requests from an HTTPS page), UDP 8200, 1853, 3489 and 15000, and TCP 8200 (needed only if your policy lists explicit ports/IPs). Inbound connections are not required.
     Wildcard domains are checked using representative hostnames; a warning may mean that hostname does not exist rather than that it is blocked.
     SSL/TLS inspection and proxies can degrade sessions even when these checks pass.
   </div>
@@ -75,7 +75,7 @@
  */
 const ENDPOINTS = [
   { wildcard: "*.gotomypc.com",   hosts: ["www.gotomypc.com", "support.gotomypc.com"], required: true,  purpose: "GoToMyPC product domain" },
-  { wildcard: "turn-media.gotoresolve.com", hosts: ["turn-media.gotoresolve.com"], required: true, purpose: "Media relay (TCP 443)" },
+  { wildcard: "turn-media.gotoresolve.com", hosts: ["turn-media.gotoresolve.com"], required: false, purpose: "Media relay (TCP 443). A TURN relay may not answer web requests, so a failure here is inconclusive" },
   { wildcard: "*.gotoresolve.com", hosts: ["turn.gotoresolve.com", "www.gotoresolve.com"], required: false, purpose: "Relay / session services (TCP 443)" },
   { wildcard: "api.filepicker.io", hosts: ["api.filepicker.io"], required: true, purpose: "File transfer helper" },
   { wildcard: "*.filestackapi.com", hosts: ["www.filestackapi.com", "cdn.filestackcontent.com"], required: false, purpose: "File transfer helper" },
@@ -90,7 +90,6 @@ const ENDPOINTS = [
   { wildcard: "*.internapcdn.net", hosts: ["www.internapcdn.net", "download.internapcdn.net"], required: false, purpose: "Software updates" },
   { wildcard: "*.measurement-lab.org", hosts: ["www.measurement-lab.org", "speed.measurementlab.net"], required: false, purpose: "Session diagnostics" },
   { wildcard: "*.cloudfront.net", hosts: ["www.cloudfront.net"], required: false, purpose: "Third-party CDN" },
-  { wildcard: "TCP 80 (in-session)", hosts: ["www.gotomypc.com"], port: 80, required: false, purpose: "Recommended for in-session communication" },
 ];
 const TIMEOUT_MS = 8000;
 
