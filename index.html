@@ -13,6 +13,7 @@
   body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
   main { max-width:760px; margin:0 auto; padding:24px 16px 48px; }
   h1 { font-size:1.5rem; margin:0 0 4px; }
+  h2 { font-size:1.05rem; margin:0 0 2px; }
   .sub { color:var(--muted); margin:0 0 20px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:16px; }
   #banner { font-size:1.15rem; font-weight:600; }
@@ -42,9 +43,20 @@
   </div>
 
   <div class="card">
+    <h2>Required</h2>
+    <p class="note" style="margin:0 0 8px">GoToMyPC will not work if any of these are blocked.</p>
     <table>
       <thead><tr><th>Status</th><th>Endpoint</th><th>Purpose</th></tr></thead>
-      <tbody id="rows"></tbody>
+      <tbody id="rows-required"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Recommended</h2>
+    <p class="note" style="margin:0 0 8px">Improves performance or enables optional features; a failure here is not fatal.</p>
+    <table>
+      <thead><tr><th>Status</th><th>Endpoint</th><th>Purpose</th></tr></thead>
+      <tbody id="rows-recommended"></tbody>
     </table>
   </div>
 
@@ -124,7 +136,8 @@ function label(ep) {
 }
 
 function render() {
-  $("rows").innerHTML = "";
+  $("rows-required").innerHTML = "";
+  $("rows-recommended").innerHTML = "";
   ENDPOINTS.forEach((ep, i) => {
     const r = results[i];
     const tr = document.createElement("tr");
@@ -136,7 +149,7 @@ function render() {
     tr.children[0].textContent = st;
     tr.children[1].textContent = label(ep);
     tr.children[2].textContent = ep.purpose;
-    $("rows").appendChild(tr);
+    $(ep.required ? "rows-required" : "rows-recommended").appendChild(tr);
   });
 }
 
@@ -161,8 +174,9 @@ function summarize(done) {
 
 function report() {
   const lines = [`GoToMyPC connectivity check - ${new Date().toISOString()}`, $("banner").textContent, ""];
-  ENDPOINTS.forEach((ep, i) => {
-    const r = results[i];
+  const order = ENDPOINTS.map((ep, i) => i).sort((a, b) => ENDPOINTS[b].required - ENDPOINTS[a].required);
+  order.forEach(i => {
+    const ep = ENDPOINTS[i], r = results[i];
     lines.push(`${r && r.ok ? "PASS" : ep.required ? "FAIL" : "WARN"}  ${label(ep)}  [${ep.hosts.join(", ")}]  ${r ? (r.ok ? r.ms + " ms" : r.err) : "not run"}`);
   });
   lines.push("", `Browser: ${navigator.userAgent}`, `Online flag: ${navigator.onLine}`);
